@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Contact Trial</string>
+    <string name="action_settings">Settings</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="save">Save</string>
+</resources>
