@@ -3,18 +3,24 @@ package com.example.veraj.contacttrial;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CODE:
                 if (resultCode == Activity.RESULT_OK){
                     Log.i(TAG, "Contact Received");
-                    //Contact contact = (Contact)data.getSerializableExtra("Contact Class");
+                    //Contact contact = (ContaTestct)data.getSerializableExtra("Contact Class");
                     Contact contact = (Contact) AddContact.getObject(data);
                     Log.i(TAG, contact.getFirstName());
                     addContact(contact);
@@ -73,10 +79,28 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     Log.i(TAG, "AddContact Activity Cancelled");
                 }
+                break;
+            case 002:
+                if (resultCode == RESULT_OK) {
+                    try {
+                        final Uri imageUri = data.getData();
+                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                        ImageButton addPhoto = (ImageButton) findViewById(R.id.addPhoto);
+                        addPhoto.setImageBitmap(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+
+                }else {
+                    Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
+                }
+                break;
+
         }
     }
 
-    //METHOD WHICH WILL HANDLE DYNAMIC INSERTION
     public void addContact(Contact contact) {
         listItems.add(contact.getFirstName() + " " + contact.getLastName());
         adapter.notifyDataSetChanged();

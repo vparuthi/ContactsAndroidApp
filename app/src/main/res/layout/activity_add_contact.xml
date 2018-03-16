@@ -10,23 +10,43 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <EditText
             android:id="@+id/firstName"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="@string/firstname"/>
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/firstname" />
+
         <EditText
             android:id="@+id/lastName"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/firstName"
-            android:hint="@string/lastname"/>
-        <Button
-            android:id="@+id/addButton"
+            android:layout_alignStart="@+id/firstName"
+            android:layout_below="@+id/firstName"
+            android:hint="@string/lastname" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_addContact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/save"
-            android:layout_below="@+id/firstName"/>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@android:color/white"
+            android:clickable="true"
+            app:backgroundTint="@android:color/background_light" />
+
+        <ImageButton
+            android:id="@+id/addPhoto"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="fitCenter" />
+
     </RelativeLayout>
 
 
