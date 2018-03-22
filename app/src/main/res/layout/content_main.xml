@@ -14,5 +14,13 @@
         android:id="@+id/listView"
         android:drawSelectorOnTop="false"
         android:scrollbarAlwaysDrawVerticalTrack="true"/>
+    <TextView
+        android:id="@+id/noContactsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="No Contacts Present"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -14,26 +13,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.example.veraj.contacttrial";
     public static final int REQUEST_CODE = 001;
+    public static final String CLICKED_CONTACT = "Clicked Contact";
 
     //List of Array String that will serve as the list items
-    ArrayList<String> listItems = new ArrayList<String>();
+    ArrayList<Contact> listItems = new ArrayList<Contact>();
 
     //Defining a string Adapter that will handle the ListView Data
-    ArrayAdapter<String> adapter;
-
-
+    ArrayAdapter<Contact> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ListView list = (ListView) findViewById(R.id.listView);
 
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,listItems);
+        adapter = new ContactAdapter(this, listItems);
         list.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -73,28 +71,18 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "Contact Received");
                     //Contact contact = (ContaTestct)data.getSerializableExtra("Contact Class");
                     Contact contact = (Contact) AddContact.getObject(data);
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeStream(this.openFileInput("myImage"));
+                        //contact.setContactPhoto(bitmap);
+                        addContact(contact);
+                    } catch (FileNotFoundException e) {
+                    }
+
                     Log.i(TAG, contact.getFirstName());
-                    addContact(contact);
+                    //addContact(contact);
                 }
                 else {
                     Log.i(TAG, "AddContact Activity Cancelled");
-                }
-                break;
-            case 002:
-                if (resultCode == RESULT_OK) {
-                    try {
-                        final Uri imageUri = data.getData();
-                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        ImageButton addPhoto = (ImageButton) findViewById(R.id.addPhoto);
-                        addPhoto.setImageBitmap(selectedImage);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
-
-                }else {
-                    Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -102,10 +90,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addContact(Contact contact) {
-        listItems.add(contact.getFirstName() + " " + contact.getLastName());
+        listItems.add(contact);
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TextView noContactsPresent = (TextView) findViewById(R.id.noContactsText);
+        if (listItems.size() == 0) {
+            noContactsPresent.setVisibility(View.VISIBLE);
+        }
+        else {
+            noContactsPresent.setVisibility(View.GONE);
+        }
+        adapter.sort(new Comparator<Contact>() {
+            @Override
+            public int compare(Contact c1, Contact c2) {
+                return c1.getFirstName().compareTo(c2.getFirstName());
+            }
+        });
+
+        final ListView list = (ListView) findViewById(R.id.listView);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = Display.makeIntent(MainActivity.this);
+                intent.putExtra(CLICKED_CONTACT, listItems.get(i));
+                startActivity(intent);
+            }
+        });
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

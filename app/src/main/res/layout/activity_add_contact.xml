@@ -13,15 +13,18 @@
 
         <EditText
             android:id="@+id/firstName"
-            android:layout_width="150dp"
+            android:minWidth="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/addPhoto"
+            android:layout_marginLeft="15dp"
             android:hint="@string/firstname" />
 
         <EditText
             android:id="@+id/lastName"
-            android:layout_width="150dp"
+            android:minWidth="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/firstName"
             android:layout_below="@+id/firstName"
@@ -39,13 +42,14 @@
             android:clickable="true"
             app:backgroundTint="@android:color/background_light" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/addPhoto"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:background="@null"/>
 
     </RelativeLayout>
 

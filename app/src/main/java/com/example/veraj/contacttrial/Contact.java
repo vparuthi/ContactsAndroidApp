@@ -1,5 +1,7 @@
 package com.example.veraj.contacttrial;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,15 @@ import java.io.Serializable;
 public class Contact implements Serializable{
     private String firstName;
     private String lastName;
+    private Bitmap contactPhoto;
+
+    public Bitmap getContactPhoto() {
+        return contactPhoto;
+    }
+
+    public void setContactPhoto(Bitmap contactPhoto) {
+        this.contactPhoto = contactPhoto;
+    }
 
     public String getLastName() {
         return lastName;
