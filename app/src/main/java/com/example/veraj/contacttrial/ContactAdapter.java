@@ -35,7 +35,7 @@ class ContactAdapter extends ArrayAdapter <Contact>{
 
         first_name.setText(contact.getFirstName());
         last_name.setText(contact.getLastName());
-        addPhoto.setImageBitmap(contact.getContactPhoto());
+        addPhoto.setImageBitmap(BitmapUtil.getThumbnail("contact" + contact.getFirstName() +".png", view.getContext()));
         return view;
     }
 }

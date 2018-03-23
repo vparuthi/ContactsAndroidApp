@@ -26,7 +26,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddContact" />
-        <activity android:name=".DisplayContact" />
         <activity
             android:name=".Display"
             android:label="@string/title_activity_display"

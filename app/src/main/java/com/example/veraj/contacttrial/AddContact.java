@@ -32,7 +32,7 @@ public class AddContact extends AppCompatActivity {
     public static final String TAG = "com.example.veraj.contacttrial";
     public static final int REQUEST_READ_PHOTO = 010;
     public static final int REQUEST_CODE_ADD_PHOTO = 001;
-    private boolean checkIfAttahced = false;
+    private boolean addPhotoClicked = false;
 
 
     @Override
@@ -42,6 +42,8 @@ public class AddContact extends AppCompatActivity {
         endActivityButton();
         ImageView addPhoto = (ImageView) findViewById(R.id.addPhoto);
         addPhoto.setImageResource(R.drawable.camera_icon);
+
+        //Add Photo Listener
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,26 +53,9 @@ public class AddContact extends AppCompatActivity {
                 } else{
                     openGallery();
                 }
-                checkIfAttahced = true;
+               addPhotoClicked = true;
             }
         });
-    }
-
-    public boolean saveImageToInternalStorage(Bitmap image, Contact contact) {
-
-        try {
-            // Use the compress method on the Bitmap object to write image to
-            // the OutputStream
-            FileOutputStream fos = this.openFileOutput("contact" + contact.getFirstName() + ".png" , Context.MODE_PRIVATE);
-            // Writing the bitmap to the output stream
-            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.close();
-
-            return true;
-        } catch (Exception e) {
-            Log.e("saveToInternalStorage()", e.getMessage());
-            return false;
-        }
     }
 
     private void showGallery(View view) {
@@ -85,6 +70,27 @@ public class AddContact extends AppCompatActivity {
             //Request Permission
             requestPermissions(new String []{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PHOTO);
         }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_READ_PHOTO){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                openGallery();
+            } else {
+                Toast.makeText(this, "Gallery permission was not granted", Toast.LENGTH_SHORT).show();
+            }
+        }else {
+             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
+    public void openGallery(){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, REQUEST_CODE_ADD_PHOTO);
     }
 
     public void endActivityButton (){
@@ -103,8 +109,12 @@ public class AddContact extends AppCompatActivity {
                 //Extract Data from Add Contact UI
                 contact.setFirstName(firstName.getText().toString());
                 contact.setLastName(lastName.getText().toString());
+                if (!addPhotoClicked){
+                    ImageView addPhoto = (ImageView) findViewById(R.id.addPhoto);
+                    addPhoto.setImageResource(R.drawable.contact_outline);
+                }
                 Bitmap bitmap = ((BitmapDrawable)addPhoto.getDrawable()).getBitmap();
-                saveImageToInternalStorage(bitmap, contact);
+                BitmapUtil.saveImageToInternalStorage(bitmap, contact, AddContact.this);
 
                 //Pass Data back
                 Intent intent = new Intent();
@@ -118,29 +128,16 @@ public class AddContact extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_PHOTO){
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                openGallery();
-            } else {
-                Toast.makeText(this, "Gallery permission was not granted", Toast.LENGTH_SHORT).show();
-            }
-        }else {
-             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
             case REQUEST_CODE_ADD_PHOTO:
                 if (resultCode == RESULT_OK) {
                     try {
-                            final Uri imageUri = data.getData();
-                            final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                            final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                            ImageView addPhoto = (ImageView) findViewById(R.id.addPhoto);
-                            addPhoto.setImageBitmap(selectedImage);
+                        final Uri imageUri = data.getData();
+                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                        ImageView addPhoto = (ImageView) findViewById(R.id.addPhoto);
+                        addPhoto.setImageBitmap(selectedImage);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                         Toast.makeText(AddContact.this, "Something went wrong", Toast.LENGTH_LONG).show();
@@ -148,18 +145,12 @@ public class AddContact extends AppCompatActivity {
 
                 }else {
                     Toast.makeText(AddContact.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
-                    checkIfAttahced = false;
                 }
                 break;
 
         }
     }
 
-    public void openGallery(){
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, REQUEST_CODE_ADD_PHOTO);
-    }
 
     public static Intent makeIntent (Context context){
         Intent intent = new Intent(context, AddContact.class);

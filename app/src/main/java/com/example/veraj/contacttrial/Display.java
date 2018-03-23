@@ -2,22 +2,18 @@ package com.example.veraj.contacttrial;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.File;
-import java.io.FileInputStream;
+import android.widget.Toast;
 
 public class Display extends AppCompatActivity {
     public static final String CLICKED_CONTACT = "Clicked Contact";
+    public static final int EDIT_CONTACT = 001;
 
 
     @Override
@@ -31,37 +27,36 @@ public class Display extends AppCompatActivity {
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setImageResource(R.drawable.edit);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = AddContact.makeIntent(Display.this);
+                startActivityForResult(intent, EDIT_CONTACT);
             }
         });
 
         Intent intent = getIntent();
         Contact contact = (Contact) intent.getSerializableExtra(CLICKED_CONTACT);
-        //getSupportActionBar().setTitle(contact.getFirstName());
         TextView firstName = (TextView) findViewById(R.id.firstName);
         firstName.setText(contact.getFirstName());
         ImageView contactPhoto = (ImageView) findViewById(R.id.contactPhoto);
-        contactPhoto.setImageBitmap(getThumbnail("contact" + contact.getFirstName() +".png"));
-
+        contactPhoto.setImageBitmap(BitmapUtil.getThumbnail("contact" + contact.getFirstName() +".png", this));
+        getSupportActionBar().setTitle(contact.getFirstName() + " " + contact.getLastName());
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case EDIT_CONTACT:
+                if (resultCode == RESULT_OK){
+                    Toast.makeText(this, "Editted", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
     public static Intent makeIntent (Context context){
         Intent intent = new Intent(context, Display.class);
         return intent;
     }
-
-    public Bitmap getThumbnail(String filename) {
-        Bitmap thumbnail = null;
-        try {
-            File filePath = getFileStreamPath(filename);
-            FileInputStream fi = new FileInputStream(filePath);
-            thumbnail = BitmapFactory.decodeStream(fi);
-        } catch (Exception ex) {
-            Log.e("Thumbnail on internal", ex.getMessage());
-        }
-        return thumbnail;
-    }
-
-
 }
